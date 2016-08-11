@@ -15,19 +15,8 @@ end
 post '/charge' do
 
   # Get the credit card details submitted by the form
-  token = params[:stripeToken]
   source = params[:source] || params[:stripe_token] || params[:stripeToken]
   customer = params[:customer]
-
-  # Create a Customer 
-  customer = Stripe::Customer.create(
-  :source => token
-  :plan => 1001,
-  :email => "payinguser@example.com"
-  :coupon => "LOVEINFRONT", 
-  :description => "HOPE THIS WORKS"
-)
-
 
   # Create the charge on Stripe's servers - this will charge the user's card
   begin
