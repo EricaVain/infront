@@ -22,22 +22,22 @@ post '/charge' do
   # Create a Customer 
   customer = Stripe::Customer.create(
   :source => token
-  :plan => "1001",
+  :plan => 1001,
   :email => "payinguser@example.com"
   :coupon => "LOVEINFRONT", 
   :description => "HOPE THIS WORKS"
 )
 
 
-  # # Create the charge on Stripe's servers - this will charge the user's card
-  # begin
-  #   charge = Stripe::Charge.create(
-  #     :amount => params[:amount], # this number should be in cents
-  #     :currency => "usd",
-  #     :customer => customer,
-  #     :source => source,
-  #     :description => "Example Charge"
-  #   )
+  # Create the charge on Stripe's servers - this will charge the user's card
+  begin
+    charge = Stripe::Charge.create(
+      :amount => params[:amount], # this number should be in cents
+      :currency => "usd",
+      :customer => customer,
+      :source => source,
+      :description => "Example Charge"
+    )
   rescue Stripe::StripeError => e
     status 402
     return "Error creating charge: #{e.message}"
