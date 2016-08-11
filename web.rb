@@ -25,8 +25,7 @@ post '/charge' do
       :currency => "usd",
       :customer => customer,
       :source => source,
-      :description => "Example Charge"
-      :email => "no@vainllc.com"
+      :description => "This is some bullshit"
     )
   rescue Stripe::StripeError => e
     status 402
