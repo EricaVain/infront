@@ -18,15 +18,6 @@ post '/charge' do
   source = params[:source] || params[:stripe_token] || params[:stripeToken]
   customer = params[:customer]
 
-  Stripe::Customer.create(
-  :source => source, # obtained from Stripe.js
-  :plan => "1001",
-  :email => "payinguser@example.com"
-  :coupon => "LOVEINFRONT", 
-  :description => "HOPE THIS WORKS"
-)
-
-
   # Create the charge on Stripe's servers - this will charge the user's card
   begin
     charge = Stripe::Charge.create(
