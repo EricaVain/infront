@@ -5,72 +5,108 @@ require 'json'
 
 Dotenv.load
 
-
-# Set your secret key: remember to change this to your live secret key in production
-# See your keys here https://dashboard.stripe.com/account/apikeys
-Stripe.api_key = "sk_test_eaeGvpJQ51LC1omnd4AISycn"
+Stripe.api_key = ENV['STRIPE_TEST_SECRET_KEY']
 
 get '/' do
   status 200
   return "Great, your backend is set up. Now you can configure the Stripe example iOS apps to point here."
 end
 
+post '/charge' do
 
+  # Get the credit card details submitted by the form
+  source = params[:source] || params[:stripe_token] || params[:stripeToken]
+  customer = "no@vainllc.com"
 
-
-# Get the credit card details submitted by the form
-token = params[:stripeToken]
-
-# Create a Customer
-customer = Stripe::Customer.create(
-  :source => token,
-  :description => "Example customer",
-  :email => "no@vainllc.com",
+  # Create the charge on Stripe's servers - this will charge the user's card
+  begin
+    charge = Stripe::Subscription.create(
+  :source => source,
+  :customer => customer,
   :plan => "1001"
 )
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error creating charge: #{e.message}"
+  end
 
-# Charge the Customer instead of the card
-Stripe::Charge.create(
-    :amount => 1000, # in cents
-    :currency => "usd",
-    :customer => customer.id
-)
+  status 200
+  return "Charge successfully created"
 
-# YOUR CODE: Save the customer ID and other info in a database for later!
+end
 
-# YOUR CODE: When it's time to charge the customer again, retrieve the customer ID!
+get '/customers/:customer' do
 
-Stripe::Charge.create(
-  :amount   => 1500, # $15.00 this time
-  :currency => "usd",
-  :customer => customer_id # Previously stored, then retrieved
-)
+  customer = params[:customer]
 
-begin
-  # Use Stripe's library to make requests...
-rescue Stripe::CardError => e
-  # Since it's a decline, Stripe::CardError will be caught
-  body = e.json_body
-  err  = body[:error]
+  begin
+    # Retrieves the customer's cards
+    customer = Stripe::Customer.retrieve(customer)
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error retrieving customer: #{e.message}"
+  end
 
-  puts "Status is: #{e.http_status}"
-  puts "Type is: #{err[:type]}"
-  puts "Code is: #{err[:code]}"
-  # param is '' in this case
-  puts "Param is: #{err[:param]}"
-  puts "Message is: #{err[:message]}"
-rescue Stripe::RateLimitError => e
-  # Too many requests made to the API too quickly
-rescue Stripe::InvalidRequestError => e
-  # Invalid parameters were supplied to Stripe's API
-rescue Stripe::AuthenticationError => e
-  # Authentication with Stripe's API failed
-  # (maybe you changed API keys recently)
-rescue Stripe::APIConnectionError => e
-  # Network communication with Stripe failed
-rescue Stripe::StripeError => e
-  # Display a very generic error to the user, and maybe send
-  # yourself an email
-rescue => e
-  # Something else happened, completely unrelated to Stripe
+  status 200
+  content_type :json
+  customer.to_json
+
+end
+
+post '/customers/:customer/sources' do
+
+  source = params[:source]
+  customer = params[:customer]
+
+  # Adds the token to the customer's sources
+  begin
+    customer = Stripe::Customer.retrieve(customer)
+    customer.sources.create({:source => source})
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error adding token to customer: #{e.message}"
+  end
+
+  status 200
+  return "Successfully added source."
+
+end
+
+post '/customers/:customer/select_source' do
+
+  source = params[:source]
+  customer = params[:customer]
+
+  # Sets the customer's default source
+  begin
+    customer = Stripe::Customer.retrieve(customer)
+    customer.default_source = source
+    customer.save
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error selecting default source: #{e.message}"
+  end
+
+  status 200
+  return "Successfully selected default source."
+
+end
+
+delete '/customers/:customer/cards/:card' do
+
+  card = params[:card]
+  customer = params[:customer]
+
+  # Deletes the source from the customer
+  begin
+    customer = Stripe::Customer.retrieve(customer)
+    customer.sources.retrieve(card).delete()
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error deleting card"
+  end
+
+  status 200
+  return "Successfully deleted card."
+
 end
