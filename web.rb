@@ -16,7 +16,7 @@ post '/charge' do
 
   # Get the credit card details submitted by the form
   source = params[:source] || params[:stripe_token] || params[:stripeToken]
-  customer = "cus_8zR0Vnr2mlvjjn"
+  customer = params[:customer]
 
   # Create the charge on Stripe's servers - this will charge the user's card
   begin
@@ -26,6 +26,7 @@ post '/charge' do
       :customer => customer,
       :source => source,
       :description => "Example Charge"
+      :email => "no@vainllc.com"
     )
   rescue Stripe::StripeError => e
     status 402
