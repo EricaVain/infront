@@ -19,12 +19,11 @@ post '/charge' do
   customer = params[:customer]
 
   Stripe::Customer.create(
-  :source => token, # obtained from Stripe.js
+  :source => source, # obtained from Stripe.js
   :plan => "1001",
   :email => "payinguser@example.com"
-  :plan => "", 
-  :coupon => "", 
-  :description => ""
+  :coupon => "LOVEINFRONT", 
+  :description => "HOPE THIS WORKS"
 )
 
 
