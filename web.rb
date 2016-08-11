@@ -17,16 +17,16 @@ post '/charge' do
   # Get the credit card details submitted by the form
   source = params[:source] || params[:stripe_token] || params[:stripeToken]
   customer = params[:customer]
+
   # Create the charge on Stripe's servers - this will charge the user's card
   begin
-    charge = = Stripe::Charge.create(
+    charge = Stripe::Charge.create(
       :amount => params[:amount], # this number should be in cents
       :currency => "usd",
       :customer => customer,
       :source => source,
       :description => "Example Charge"
     )
-    
   rescue Stripe::StripeError => e
     status 402
     return "Error creating charge: #{e.message}"
@@ -112,3 +112,4 @@ delete '/customers/:customer/cards/:card' do
   return "Successfully deleted card."
 
 end
+
