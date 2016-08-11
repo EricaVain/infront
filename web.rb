@@ -23,7 +23,7 @@ post '/charge' do
     charge = Stripe::Charge.create(
       :amount => params[:amount], # this number should be in cents
       :currency => "usd",
-      :email => "no@vainllc.customer",
+      :customer => customer,
       :source => source,
       :description => "This is some bullshit"
     )
