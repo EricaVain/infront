@@ -5,12 +5,18 @@ require 'json'
 
 Dotenv.load
 
-Stripe.api_key = ENV['STRIPE_TEST_SECRET_KEY']
+
+# Set your secret key: remember to change this to your live secret key in production
+# See your keys here https://dashboard.stripe.com/account/apikeys
+Stripe.api_key = "sk_test_eaeGvpJQ51LC1omnd4AISycn"
 
 get '/' do
   status 200
   return "Great, your backend is set up. Now you can configure the Stripe example iOS apps to point here."
 end
+
+
+
 
 # Get the credit card details submitted by the form
 token = params[:stripeToken]
@@ -18,8 +24,26 @@ token = params[:stripeToken]
 # Create a Customer
 customer = Stripe::Customer.create(
   :source => token,
-  :plan => "1001",
-  :email => "payinguser@example.com"
+  :description => "Example customer",
+  :email => "no@vainllc.com",
+  :plan => "1001"
+)
+
+# Charge the Customer instead of the card
+Stripe::Charge.create(
+    :amount => 1000, # in cents
+    :currency => "usd",
+    :customer => customer.id
+)
+
+# YOUR CODE: Save the customer ID and other info in a database for later!
+
+# YOUR CODE: When it's time to charge the customer again, retrieve the customer ID!
+
+Stripe::Charge.create(
+  :amount   => 1500, # $15.00 this time
+  :currency => "usd",
+  :customer => customer_id # Previously stored, then retrieved
 )
 
 begin
