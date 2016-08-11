@@ -20,10 +20,13 @@ post '/charge' do
 
   # Create the charge on Stripe's servers - this will charge the user's card
   begin
-    charge = Stripe::Subscription.create(
-  :source => source,
-  :customer => customer,
-  :plan => "1001"
+    charge = Stripe::Charge.create(
+      :amount => params[:amount], # this number should be in cents
+      :currency => "usd",
+      :customer => customer,
+      :source => source,
+      :description => "Example Charge"
+    )
 )
   rescue Stripe::StripeError => e
     status 402
