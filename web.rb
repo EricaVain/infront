@@ -16,8 +16,8 @@ post '/charge' do
 
   # Get the credit card details submitted by the form
   token = params[:stripeToken]
-  # source = params[:source] || params[:stripe_token] || params[:stripeToken]
-  # customer = params[:customer]
+  source = params[:source] || params[:stripe_token] || params[:stripeToken]
+  customer = params[:customer]
 
   # Create a Customer 
   customer = Stripe::Customer.create(
