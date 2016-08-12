@@ -24,7 +24,7 @@ post '/charge' do
       :amount => params[:amount], # this number should be in cents
       :currency => "usd",
       :customer => "cus_8zR0Vnr2mlvjjn",
-      :token => source,
+      :source => source,
       :description => "This is some bullshit"
     )
   rescue Stripe::StripeError => e
