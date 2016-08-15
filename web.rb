@@ -22,11 +22,10 @@ post '/charge' do
   begin
     charge = Stripe::Charge.create(
       :amount => params[:amount], # this number should be in cents
-      :plan => "3001"
       :currency => "usd",
-      :customer => "cus_8zR0Vnr2mlvjjn",
+      :customer => customer,
       :source => source,
-      :description => "This is some bullshit"
+      :description => "Example Charge"
     )
   rescue Stripe::StripeError => e
     status 402
