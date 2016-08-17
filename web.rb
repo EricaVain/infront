@@ -23,7 +23,7 @@ plan = params[:plan]
 customer = Stripe::Customer.create(
   :source => token,
   :plan => plan,
-  :email => email,
+  :receipt_email => email,
   :description => "Signed Me Up"
 )
   rescue Stripe::StripeError => e
