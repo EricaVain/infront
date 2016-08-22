@@ -34,8 +34,7 @@ end
 
 post '/charge' do
 
-  # Get the credit card details submitted by the form
-  source = params[:source] || params[:stripe_token] || params[:stripeToken]
+source = params[:source] || params[:stripe_token] || params[:stripeToken]
   customer = params[:customer]
 
   # Create the charge on Stripe's servers - this will charge the user's card
@@ -43,8 +42,9 @@ post '/charge' do
     charge = Stripe::Charge.create(
       :amount => params[:amount], # this number should be in cents
       :currency => "usd",
+      :customer => customer,
       :source => source,
-      :description => "This is some bullshit"
+      :description => "Example Charge"
     )
   rescue Stripe::StripeError => e
     status 402
