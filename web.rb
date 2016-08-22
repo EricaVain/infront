@@ -12,6 +12,26 @@ get '/' do
   return "Great, your backend is set up. Now you can configure the Stripe example iOS apps to point here."
 end
 
+post '/customers' do
+
+  source = params[:source] || params[:email] 
+
+  # Adds the token to the customer's sources
+  begin
+    customer = Stripe::Customer.create(
+      :email => params[:email]
+      :description => "Hope this works" # obtained with Stripe.js
+    )
+  rescue Stripe::StripeError => e
+    status 402
+    return "Error creating customer: #{e.message}"
+  end
+
+  status 200
+  return "Successfully added source."
+
+end
+
 post '/charge' do
 
   # Get the credit card details submitted by the form
@@ -23,9 +43,8 @@ post '/charge' do
     charge = Stripe::Charge.create(
       :amount => params[:amount], # this number should be in cents
       :currency => "usd",
-      :customer => customer,
       :source => source,
-      :description => "Example Charge"
+      :description => "This is some bullshit"
     )
   rescue Stripe::StripeError => e
     status 402
